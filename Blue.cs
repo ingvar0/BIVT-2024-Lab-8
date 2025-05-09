@@ -20,12 +20,4 @@ namespace Lab_8
         public abstract void Review();
     }
 
-    public class Mainn
-    {
-        static void Main(string[] args)
-        {
-
-        }
-    }
-
 }
