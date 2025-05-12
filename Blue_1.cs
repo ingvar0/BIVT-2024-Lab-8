@@ -1,64 +1,54 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace Lab_8
 {
-    public class Blue_1: Blue
+    public class Blue_1 : Blue
     {
-        private List<string> _output;
-        public List<string> Output => _output;
+        private string[] _output;
+        public string[] Output => _output;
+
         public Blue_1(string input) : base(input)
         {
-            _output = new List<string>();
+            _output = new string[0];
         }
 
         public override void Review()
         {
             if (string.IsNullOrWhiteSpace(Input)) return;
-            string[] text = Regex.Split(Input, @"\s+");
-            List<string> wordsList = new List<string>(text);
 
-            // пока текст не кончится, добавляем line в output 
-            while (wordsList.Count != 0)
+            string normalizedInput = Input.Replace("\n", " ").Replace("\r", "");
+            while (normalizedInput.Contains("  "))
+                normalizedInput = normalizedInput.Replace("  ", " ");
+
+            string[] words = normalizedInput.Split(' ');
+            string[] result = new string[words.Length];
+            int resultIndex = 0;
+            string currentLine = "";
+
+            foreach (string word in words)
             {
-                // создаем строку (<= 50 символов)
-                int countOfLength = 0;
-                List<string> line = new List<string>();
-                if (wordsList[0].Length > 50) return;
+                if (word.Length > 50) return;
 
-                // считаем количество символов в слове и добавляем в строку, если подходит
-                while ((countOfLength + wordsList[0].Length) <= 50)
+                if (currentLine.Length == 0)
                 {
-                    // +1 - это пробел (рассматриваем два случая)
-                    if ((countOfLength + wordsList[0].Length + 1) <= 50)
-                    {
-                        countOfLength += wordsList[0].Length + 1;
-
-                        // добавляем слово в строку
-                        line.Add(wordsList[0]);
-
-                        // удаляем слово из главного текста
-                        wordsList.RemoveAt(0);
-                    }
-                    else
-                    {
-                        line.Add(wordsList[0]);
-                        wordsList.RemoveAt(0);
-                        break;
-                    }
-
-                    if (wordsList.Count == 0) break;
-                    if (wordsList[0].Length > 50) return;
+                    currentLine = word;
                 }
-
-                string readyLine = string.Join(" ", line);
-                readyLine = readyLine.Trim();   
-                _output.Add(readyLine);
+                else if (currentLine.Length + 1 + word.Length <= 50)
+                {
+                    currentLine += " " + word;
+                }
+                else
+                {
+                    result[resultIndex++] = currentLine;
+                    currentLine = word;
+                }
             }
+
+            if (!string.IsNullOrEmpty(currentLine))
+                result[resultIndex++] = currentLine;
+
+            _output = new string[resultIndex];
+            Array.Copy(result, _output, resultIndex);
         }
 
         public override string ToString()

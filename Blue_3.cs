@@ -58,7 +58,7 @@ namespace Lab_8
                         _output[_output.Length - 1] = (firstLetter, 0);
                         _counter[_counter.Length - 1] = 1;
                     }
-                    break; 
+                    break;
                 }
             }
 
