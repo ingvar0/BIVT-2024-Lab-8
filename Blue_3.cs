@@ -15,7 +15,7 @@ namespace Lab_8
 
         public Blue_3(string input) : base(input)
         {
-            _output = Array.Empty<(char, double)>();
+            _output = null;
             _counter = Array.Empty<int>();
         }
 
@@ -95,7 +95,7 @@ namespace Lab_8
             for (int i = 0; i < _output.Length; i++)
             {
                 if (i > 0) result.Append('\n');
-                result.Append($"{_output[i].letter}-{_output[i].ratio:F4}");
+                result.Append($"{_output[i].letter} - {_output[i].ratio:F4}");
             }
             return result.ToString();
         }

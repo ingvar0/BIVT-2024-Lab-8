@@ -9,12 +9,16 @@ namespace Lab_8
 
         public Blue_1(string input) : base(input)
         {
-            _output = new string[0];
+            _output = null;
         }
 
         public override void Review()
         {
-            if (string.IsNullOrWhiteSpace(Input)) return;
+            if (string.IsNullOrEmpty(Input))
+            {
+                _output = null;
+                return;
+            }
 
             string normalizedInput = Input.Replace("\n", " ").Replace("\r", "");
             while (normalizedInput.Contains("  "))
@@ -53,7 +57,7 @@ namespace Lab_8
 
         public override string ToString()
         {
-            return string.Join("\n", _output);
+            return string.Join(Environment.NewLine, _output); 
         }
     }
 }
