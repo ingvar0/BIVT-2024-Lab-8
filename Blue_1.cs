@@ -13,50 +13,53 @@ namespace Lab_8
         }
 
         public override void Review()
-        {
+        { 
             if (string.IsNullOrEmpty(Input))
             {
                 _output = null;
                 return;
             }
 
-            string normalizedInput = Input.Replace("\n", " ").Replace("\r", "");
-            while (normalizedInput.Contains("  "))
-                normalizedInput = normalizedInput.Replace("  ", " ");
+            string[] words = Input.Split(' ');
+            string[] tempResult = new string[0];
+            int currentIndex = 0;
 
-            string[] words = normalizedInput.Split(' ');
-            string[] result = new string[words.Length];
-            int resultIndex = 0;
-            string currentLine = "";
-
-            foreach (string word in words)
+            while (currentIndex < words.Length)
             {
-                if (word.Length > 50) return;
+                string currentLine = words[currentIndex];
+                int lineLength = currentLine.Length;
+                int nextIndex = currentIndex + 1;
 
-                if (currentLine.Length == 0)
+                // Собираем строку, пока не превысим 50 символов
+                while (nextIndex < words.Length && lineLength + 1 + words[nextIndex].Length <= 50)
                 {
-                    currentLine = word;
+                    currentLine += " " + words[nextIndex];
+                    lineLength += 1 + words[nextIndex].Length;
+                    nextIndex++;
                 }
-                else if (currentLine.Length + 1 + word.Length <= 50)
+
+                // Добавляем строку в результат 
+                string[] newTemp = new string[tempResult.Length + 1];
+                for (int i = 0; i < tempResult.Length; i++)
                 {
-                    currentLine += " " + word;
+                    newTemp[i] = tempResult[i];
                 }
-                else
-                {
-                    result[resultIndex++] = currentLine;
-                    currentLine = word;
-                }
+                newTemp[tempResult.Length] = currentLine;
+                tempResult = newTemp;
+
+                currentIndex = nextIndex;
             }
 
-            if (!string.IsNullOrEmpty(currentLine))
-                result[resultIndex++] = currentLine;
-
-            _output = new string[resultIndex];
-            Array.Copy(result, _output, resultIndex);
+            _output = tempResult; 
         }
+        
 
         public override string ToString()
         {
+            if (string.Join(Environment.NewLine, _output) == "" || string.Join(Environment.NewLine, _output) == " ")
+            {
+                return null;
+            }
             return string.Join(Environment.NewLine, _output); 
         }
     }

@@ -21,83 +21,83 @@ namespace Lab_8
 
         public override void Review()
         {
-            if (string.IsNullOrWhiteSpace(Input)) return;
+            if (string.IsNullOrEmpty(Input))
+                return;
 
-            _output = Array.Empty<(char, double)>();
-            _counter = Array.Empty<int>();
-            double sum = 0;
+            // Знаки препинания для разделения слов
+            char[] separators = { ' ', '.', '!', '?', ',', ':', '"', ';', '–', '(', ')', '[', ']', '{', '}', '/' };
 
-            string[] words = Input.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-
-            foreach (string word in words)
+            // Собираем первые буквы всех слов
+            string firstLetters = "";
+            foreach (string word in Input.Split(separators, StringSplitOptions.RemoveEmptyEntries))
             {
-                if (string.IsNullOrEmpty(word)) continue;
-
-                for (int k = 0; k < word.Length; k++)
+                if (word.Length > 0 && char.IsLetter(word[0]))
                 {
-                    if (!char.IsLetter(word[k])) continue;
-
-                    char firstLetter = char.ToLower(word[k]);
-                    sum++;
-
-                    bool found = false;
-                    for (int j = 0; j < _output.Length; j++)
-                    {
-                        if (_output[j].letter == firstLetter)
-                        {
-                            _counter[j]++;
-                            found = true;
-                            break;
-                        }
-                    }
-
-                    if (!found)
-                    {
-                        Array.Resize(ref _output, _output.Length + 1);
-                        Array.Resize(ref _counter, _counter.Length + 1);
-                        _output[_output.Length - 1] = (firstLetter, 0);
-                        _counter[_counter.Length - 1] = 1;
-                    }
-                    break;
+                    firstLetters += char.ToLower(word[0]);
                 }
             }
 
-            for (int i = 0; i < _output.Length; i++)
+            // Считаем сколько раз встречается каждая буква
+            (char, int)[] counts = new (char, int)[firstLetters.Length];
+            int uniqueCount = 0;
+
+            foreach (char letter in firstLetters)
             {
-                _output[i].ratio = Math.Round((_counter[i] * 100.0) / sum, 4);
+                bool found = false;
+                for (int i = 0; i < uniqueCount; i++)
+                {
+                    if (counts[i].Item1 == letter)
+                    {
+                        counts[i].Item2++;
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found)
+                {
+                    counts[uniqueCount] = (letter, 1);
+                    uniqueCount++;
+                }
             }
 
-            Sort();
-        }
-
-        private void Sort()
-        {
-            for (int i = 0; i < _output.Length; i++)
+            // Переводим в проценты
+            _output = new (char, double)[uniqueCount];
+            for (int i = 0; i < uniqueCount; i++)
             {
-                for (int j = 0; j < _output.Length - i - 1; j++)
+                double percent = (counts[i].Item2 * 100.0) / firstLetters.Length;
+                _output[i] = (counts[i].Item1, percent);
+            }
+
+            // Сортируем результаты
+            for (int i = 0; i < _output.Length - 1; i++)
+            {
+                for (int j = i + 1; j < _output.Length; j++)
                 {
-                    if ((_output[j].ratio < _output[j + 1].ratio)
-                        || ((_output[j].ratio == _output[j + 1].ratio)
-                        && (_output[j].letter > _output[j + 1].letter)))
+                    if (_output[i].Item2 < _output[j].Item2 || (_output[i].Item2 == _output[j].Item2 && _output[i].Item1 > _output[j].Item1))
                     {
-                        (_output[j], _output[j + 1]) = (_output[j + 1], _output[j]);
-                        (_counter[j], _counter[j + 1]) = (_counter[j + 1], _counter[j]);
+                        var temp = _output[i];
+                        _output[i] = _output[j];
+                        _output[j] = temp;
                     }
                 }
             }
         }
+
 
         public override string ToString()
         {
-            if (_output.Length == 0) return string.Empty;
+            if (_output == null)
+                return null;
 
-            var result = new System.Text.StringBuilder();
+            string result = "";
             for (int i = 0; i < _output.Length; i++)
             {
-                if (i > 0) result.Append('\n');
-                result.Append($"{_output[i].letter} - {_output[i].ratio:F4}");
+                result += $"{_output[i].Item1} - {_output[i].Item2:F4}";
+                if (i < _output.Length - 1)
+                    result += Environment.NewLine;
             }
-            return result.ToString();
+            return result;
         }
     }
 }

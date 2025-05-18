@@ -17,64 +17,44 @@ namespace Lab_8
 
         public override void Review()
         {
-            if (string.IsNullOrEmpty(Input) || string.IsNullOrEmpty(_sequence)) return;
+            if (string.IsNullOrWhiteSpace(Input))
+            {
+                _output = null;
+                return;
+            }
 
-            string[] words = Input.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-            string[] tempResult = new string[words.Length];
-            int resultCount = 0;
+            char[] separators = { ' ', '.', '!', '?', ',', ':', '"', ';', '–', '(', ')', '[', ']', '{', '}', '/' };
+            string[] words = Input.Split(separators, StringSplitOptions.RemoveEmptyEntries);
+
+            string result = Input;
 
             foreach (string word in words)
             {
-                // Находим индекс первой буквы
-                int firstLetterIndex = 0;
-                while (firstLetterIndex < word.Length && !char.IsLetter(word[firstLetterIndex]))
+                if (word.IndexOf(_sequence, StringComparison.OrdinalIgnoreCase) >= 0)
                 {
-                    firstLetterIndex++;
-                }
-
-                // Находим индекс последней буквы
-                int lastLetterIndex = word.Length - 1;
-                while (lastLetterIndex >= 0 && !char.IsLetter(word[lastLetterIndex]))
-                {
-                    lastLetterIndex--;
-                }
-
-                // Если слово состоит только из пунктуации то оставляем как есть
-                if (firstLetterIndex > lastLetterIndex)
-                {
-                    tempResult[resultCount++] = word;
-                    continue;
-                }
-
-                // Выделяем слово (без пунктуации по краям)
-                string cleanedWord = word.Substring(firstLetterIndex, lastLetterIndex - firstLetterIndex + 1);
-
-                // Если слово не содержит _seq добавляем в результат
-                if (cleanedWord.IndexOf(_sequence, StringComparison.OrdinalIgnoreCase) < 0)
-                {
-                    tempResult[resultCount++] = word;
-                }
-                // Если содержит _seq добавляем только пунктуацию (если она есть)
-                else
-                {
-                    // Добавляем пунктуацию ДО слова (если была)
-                    if (firstLetterIndex > 0)
-                    {
-                        string punctuationBefore = word.Substring(0, firstLetterIndex);
-                        tempResult[resultCount++] = punctuationBefore;
-                    }
-
-                    // Добавляем пунктуацию ПОСЛЕ слова (если была)
-                    if (lastLetterIndex < word.Length - 1)
-                    {
-                        string punctuationAfter = word.Substring(lastLetterIndex + 1);
-                        tempResult[resultCount++] = punctuationAfter;
-                    }
+                    result = result.Replace(word, "");
                 }
             }
 
+            // Удаляем лишние пробелы
+            while (result.Contains("  "))
+                result = result.Replace("  ", " ");
 
-            _output = string.Join(" ", tempResult, 0, resultCount).Replace(" ,", ",").Replace(" .", ".").Replace(" !", "!").Replace(" ?", "?").Replace(" ;", ";").Replace(" :", ":").Replace("  ", " ").Trim();
+            char[] punctuationMarks = { '.', '!', '?', ',', ':', ';', ')', ']', '}' };
+
+            // Удаляем пробелы перед знаками препинания
+            foreach (char mark in punctuationMarks)
+            {
+                string spaceBeforeMark = " " + mark;
+                while (result.Contains(spaceBeforeMark))
+                {
+                    result = result.Replace(spaceBeforeMark, mark.ToString());
+                }
+            }
+
+            result = result.Trim();
+
+            _output = result;
         }
 
         public override string ToString()
