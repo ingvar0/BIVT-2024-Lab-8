@@ -20,47 +20,45 @@ namespace Lab_8
                 return;
             }
 
-            string[] words = Input.Split(' ');
-            string[] tempResult = new string[0];
-            int currentIndex = 0;
-
-            while (currentIndex < words.Length)
+            _output = Input.Split(' ');
+            string[] words = new string[0];
+            
+            for (int i = 0; i < _output.Length;)
             {
-                string currentLine = words[currentIndex];
-                int lineLength = currentLine.Length;
-                int nextIndex = currentIndex + 1;
-
-                // Собираем строку, пока не превысим 50 символов
-                while (nextIndex < words.Length && lineLength + 1 + words[nextIndex].Length <= 50)
+                string cur = "";
+                int c = _output[i].Length;
+                while (c <= 50)
                 {
-                    currentLine += " " + words[nextIndex];
-                    lineLength += 1 + words[nextIndex].Length;
-                    nextIndex++;
+                    cur += _output[i++] + " ";
+                    if (i != _output.Length)
+                    {
+                        c += _output[i].Length + 1;
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
 
-                // Добавляем строку в результат 
-                string[] newTemp = new string[tempResult.Length + 1];
-                for (int i = 0; i < tempResult.Length; i++)
-                {
-                    newTemp[i] = tempResult[i];
-                }
-                newTemp[tempResult.Length] = currentLine;
-                tempResult = newTemp;
+                string[] myStrings = new string[words.Length + 1]; 
 
-                currentIndex = nextIndex;
+                Array.Copy(words, myStrings, words.Length);
+
+                myStrings[words.Length] = cur.Substring(0, cur.Length - 1);
+
+                words = myStrings;
             }
-
-            _output = tempResult; 
+            _output = words;
         }
-        
 
         public override string ToString()
         {
-            if (string.Join(Environment.NewLine, _output) == "" || string.Join(Environment.NewLine, _output) == " ")
+            if (_output.Length == 0 || _output == null)
             {
-                return null;
+                return string.Empty;
             }
-            return string.Join(Environment.NewLine, _output); 
+            return string.Join(Environment.NewLine, _output);  
+
         }
     }
 }

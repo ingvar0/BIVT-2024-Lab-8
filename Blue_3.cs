@@ -8,96 +8,108 @@ namespace Lab_8
 {
     public class Blue_3 : Blue
     {
-        private (char letter, double ratio)[] _output;
-        private int[] _counter;
-
-        public (char letter, double ratio)[] Output => _output;
-
+        private (char, double)[] _output;
+        public (char, double)[] Output => _output;
         public Blue_3(string input) : base(input)
         {
             _output = null;
-            _counter = Array.Empty<int>();
         }
 
         public override void Review()
         {
             if (string.IsNullOrEmpty(Input))
+            {
                 return;
+            }
+            int k = 0;
+            string temp = "";
+            char[] punct = { ' ', '.', '!', '?', ',', ':', '\"', ';', '–', '(', ')', '[', ']', '{', '}', '/' };
 
-            // Знаки препинания для разделения слов
-            char[] separators = { ' ', '.', '!', '?', ',', ':', '"', ';', '–', '(', ')', '[', ']', '{', '}', '/' };
-
-            // Собираем первые буквы всех слов
-            string firstLetters = "";
-            foreach (string word in Input.Split(separators, StringSplitOptions.RemoveEmptyEntries))
+            foreach (string word in Input.Split(punct, StringSplitOptions.RemoveEmptyEntries))
             {
                 if (word.Length > 0 && char.IsLetter(word[0]))
                 {
-                    firstLetters += char.ToLower(word[0]);
+                    temp += char.ToLower(word[0]);
                 }
             }
-
-            // Считаем сколько раз встречается каждая буква
-            (char, int)[] counts = new (char, int)[firstLetters.Length];
-            int uniqueCount = 0;
-
-            foreach (char letter in firstLetters)
+            (char, double)[] l = new (char, double)[temp.Length];
+            for (int i = 0; i < l.Length; i++)
             {
-                bool found = false;
-                for (int i = 0; i < uniqueCount; i++)
+                l[i] = ('\0', 0);
+            }
+            foreach (char symb in temp)
+            {
+                bool fl = false;
+                for (int i = 0; i < l.Length; i++)
                 {
-                    if (counts[i].Item1 == letter)
+                    if (l[i].Item1 == symb)
                     {
-                        counts[i].Item2++;
-                        found = true;
+                        l[i] = (symb, l[i].Item2 + 1);
+                        fl = true;
                         break;
                     }
                 }
-
-                if (!found)
+                if (!fl)
                 {
-                    counts[uniqueCount] = (letter, 1);
-                    uniqueCount++;
-                }
-            }
-
-            // Переводим в проценты
-            _output = new (char, double)[uniqueCount];
-            for (int i = 0; i < uniqueCount; i++)
-            {
-                double percent = (counts[i].Item2 * 100.0) / firstLetters.Length;
-                _output[i] = (counts[i].Item1, percent);
-            }
-
-            // Сортируем результаты
-            for (int i = 0; i < _output.Length - 1; i++)
-            {
-                for (int j = i + 1; j < _output.Length; j++)
-                {
-                    if (_output[i].Item2 < _output[j].Item2 || (_output[i].Item2 == _output[j].Item2 && _output[i].Item1 > _output[j].Item1))
+                    for (int j = 0; j < l.Length; j++)
                     {
-                        var temp = _output[i];
-                        _output[i] = _output[j];
-                        _output[j] = temp;
+                        if (l[j].Item1 == '\0')
+                        {
+                            l[j] = (symb, 1);
+                            k++;
+                            break;
+                        }
                     }
                 }
             }
-        }
+            int ind = 0;
+            var ans = new (char, double)[k];
+            foreach (var x in l)
+            {
+                if (!(x.Item1 == '\0')) 
+                {
+                    double percent = x.Item2 / temp.Length * 100;
+                    ans[ind] = (x.Item1, percent);
+                    ind++;
+                }
+            }
 
+            for (int i = 0; i < ans.Length - 1; i++)
+            {
+                for (int j = 0; j < ans.Length - i - 1; j++)
+                {
+                    bool flag = false;
+
+                    if (ans[j].Item2 < ans[j + 1].Item2)
+                    {
+                        flag = true;
+                    }
+                    
+                    else if (ans[j].Item2 == ans[j + 1].Item2 &&
+                             ans[j].Item1 > ans[j + 1].Item1)
+                    {
+                        flag = true;
+                    }
+
+                    if (flag)
+                    {
+                        var newTemp = ans[j];
+                        ans[j] = ans[j + 1];
+                        ans[j + 1] = newTemp;
+                    }
+                }
+            }
+
+            _output = ans;
+        }
 
         public override string ToString()
         {
             if (_output == null)
-                return null;
-
-            string result = "";
-            for (int i = 0; i < _output.Length; i++)
             {
-                result += $"{_output[i].Item1} - {_output[i].Item2:F4}";
-                if (i < _output.Length - 1)
-                    result += Environment.NewLine;
+                return null;
             }
-            return result;
+            return string.Join(Environment.NewLine, Array.ConvertAll(_output, cortege => $"{cortege.Item1} - {cortege.Item2:F4}")); 
         }
     }
 }
