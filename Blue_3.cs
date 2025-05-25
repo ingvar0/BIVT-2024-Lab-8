@@ -9,7 +9,10 @@ namespace Lab_8
     public class Blue_3 : Blue
     {
         private (char, double)[] _output;
-        public (char, double)[] Output => _output;
+
+        // Возвращаем копию массива вместо оригинала
+        public (char, double)[] Output => _output != null ? ((char, double)[])_output.Clone() : null;
+
         public Blue_3(string input) : base(input)
         {
             _output = null;
@@ -19,6 +22,7 @@ namespace Lab_8
         {
             if (string.IsNullOrEmpty(Input))
             {
+                _output = null;
                 return;
             }
             int k = 0;
@@ -84,7 +88,7 @@ namespace Lab_8
                     {
                         flag = true;
                     }
-                    
+
                     else if (ans[j].Item2 == ans[j + 1].Item2 &&
                              ans[j].Item1 > ans[j + 1].Item1)
                     {
@@ -105,9 +109,9 @@ namespace Lab_8
 
         public override string ToString()
         {
-            if (_output == null)
+            if (_output == null || _output.Length == 0)
             {
-                return null;
+                return string.Empty;
             }
             return string.Join(Environment.NewLine, Array.ConvertAll(_output, cortege => $"{cortege.Item1} - {cortege.Item2:F4}")); 
         }
