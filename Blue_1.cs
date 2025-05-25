@@ -1,11 +1,13 @@
-﻿using System;
+using System;
 
 namespace Lab_8
 {
     public class Blue_1 : Blue
     {
         private string[] _output;
-        public string[] Output => _output;
+        
+        // Возвращаем копию массива вместо оригинала
+        public string[] Output => _output != null ? (string[])_output.Clone() : null;
 
         public Blue_1(string input) : base(input)
         {
@@ -20,19 +22,19 @@ namespace Lab_8
                 return;
             }
 
-            _output = Input.Split(' ');
+            var tempOutput = Input.Split(' ');
             string[] words = new string[0];
-            
-            for (int i = 0; i < _output.Length;)
+
+            for (int i = 0; i < tempOutput.Length;)
             {
                 string cur = "";
-                int c = _output[i].Length;
+                int c = tempOutput[i].Length;
                 while (c <= 50)
                 {
-                    cur += _output[i++] + " ";
-                    if (i != _output.Length)
+                    cur += tempOutput[i++] + " ";
+                    if (i != tempOutput.Length)
                     {
-                        c += _output[i].Length + 1;
+                        c += tempOutput[i].Length + 1;
                     }
                     else
                     {
@@ -41,11 +43,8 @@ namespace Lab_8
                 }
 
                 string[] myStrings = new string[words.Length + 1]; 
-
                 Array.Copy(words, myStrings, words.Length);
-
                 myStrings[words.Length] = cur.Substring(0, cur.Length - 1);
-
                 words = myStrings;
             }
             _output = words;
@@ -53,12 +52,11 @@ namespace Lab_8
 
         public override string ToString()
         {
-            if (_output.Length == 0 || _output == null)
+            if (_output == null || _output.Length == 0)
             {
                 return string.Empty;
             }
             return string.Join(Environment.NewLine, _output);  
-
         }
     }
 }
